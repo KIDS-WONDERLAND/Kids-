@@ -4,81 +4,167 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Kids Wonderland AI</title>
+
 <style>
 body {
-  font-family: Arial, sans-serif;
-  background: linear-gradient(135deg,#17152f,#39245d);
-  color: white;
+  margin: 0;
   padding: 20px;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg, #17152f, #39245d);
+  color: white;
   text-align: center;
 }
 .container {
-  max-width: 500px;
-  margin: auto;
-  background: #252141;
-  padding: 22px;
+  max-width: 600px;
+  margin: 30px auto;
+  padding: 25px;
+  background: #ffffff12;
   border-radius: 20px;
 }
-textarea, select, button {
+h1 { color: #ffd86b; }
+textarea, input, button {
   box-sizing: border-box;
   width: 100%;
   padding: 14px;
-  margin-top: 14px;
+  margin: 10px 0;
+  border: 0;
   border-radius: 10px;
   font-size: 16px;
 }
-textarea { height: 140px; }
-button {
-  background: #ff70b5;
-  color: white;
-  border: 0;
-  font-weight: bold;
+textarea {
+  height: 150px;
+  resize: vertical;
 }
-#hasil { margin-top: 20px; }
+button {
+  background: #ffcf5c;
+  color: #251442;
+  font-weight: bold;
+  cursor: pointer;
+}
+button:disabled {
+  opacity: .6;
+  cursor: wait;
+}
+#status { line-height: 1.6; }
+video {
+  width: 100%;
+  margin-top: 15px;
+  border-radius: 12px;
+  background: #111;
+}
+small { color: #ddd; }
 </style>
 </head>
+
 <body>
 <div class="container">
-  <h1>🎬 Kids Wonderland AI</h1>
-  <p>Ubah ceritamu menjadi ide animasi 3D!</p>
+  <h1>🦄 Kids Wonderland AI</h1>
+  <p>Buat video dari cerita imajinasimu!</p>
 
-  <textarea id="cerita"
-    placeholder="Tuliskan cerita kamu di sini..."></textarea>
+  <textarea id="story"
+    placeholder="Contoh: Seekor kelinci cokelat menemukan bunga mawar ungu di hutan ajaib..."></textarea>
 
-  <select id="gaya">
-    <option>Animasi 3D lucu</option>
-    <option>Kartun 3D sinematik</option>
-    <option>Animasi fantasi</option>
-    <option>Animasi anak-anak</option>
-  </select>
+  <input id="token" type="password"
+    placeholder="Token Hugging Face (jika diperlukan)">
 
-  <select id="durasi">
-    <option value="5">5 detik</option>
-    <option value="10">10 detik</option>
-    <option value="15">15 detik</option>
-    <option value="30">30 detik</option>
-  </select>
+  <button id="generate" onclick="buatVideo()">
+    🎬 BUAT VIDEO AI
+  </button>
 
-  <button onclick="buatVideo()">✨ BUAT VIDEO</button>
-  <div id="hasil"></div>
+  <p id="status">
+    Masukkan cerita untuk memulai.
+  </p>
+
+  <video id="hasil" controls playsinline hidden></video>
+
+  <a id="download" hidden download="kids-wonderland.mp4">
+    <button type="button">⬇️ Unduh Video</button>
+  </a>
+
+  <small>
+    Pembuatan video memerlukan model AI yang mendukung
+    text-to-video dan akses API yang sesuai.
+  </small>
 </div>
 
 <script>
-function buatVideo() {
-  const cerita = document.getElementById("cerita").value.trim();
-  const gaya = document.getElementById("gaya").value;
-  const durasi = document.getElementById("durasi").value;
-  const hasil = document.getElementById("hasil");
+async function buatVideo() {
+  const cerita = document.getElementById("story").value.trim();
+  const token = document.getElementById("token").value.trim();
+  const status = document.getElementById("status");
+  const tombol = document.getElementById("generate");
 
   if (!cerita) {
-    hasil.textContent = "Silakan tulis ceritamu terlebih dahulu.";
+    alert("Masukkan cerita terlebih dahulu!");
     return;
   }
 
-  hasil.textContent =
-    "Cerita siap diproses! Gaya: " + gaya +
-    ". Durasi: " + durasi +
-    " detik. Mesin AI video belum dihubungkan.";
+  if (!token) {
+    alert("Masukkan token API Hugging Face terlebih dahulu!");
+    return;
+  }
+
+  tombol.disabled = true;
+  status.textContent = "Memeriksa akses model AI...";
+
+  try {
+    // Ganti dengan endpoint model text-to-video yang benar-benar
+    // tersedia untuk akunmu dan mendukung inferensi API.
+    const endpoint = prompt(
+      "Masukkan URL endpoint model text-to-video Hugging Face:"
+    );
+
+    if (!endpoint || !endpoint.startsWith("https://")) {
+      throw new Error("URL endpoint belum valid.");
+    }
+
+    status.textContent =
+      "Mengirim cerita ke mesin AI. Tunggu prosesnya...";
+
+    const response = await fetch(endpoint, {
+      method: "POST",
+      headers: {
+        "Authorization": "Bearer " + token,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        inputs: cerita
+      })
+    });
+
+    if (!response.ok) {
+      const detail = await response.text();
+      throw new Error(
+        "API gagal (" + response.status + "). " +
+        detail.slice(0, 250)
+      );
+    }
+
+    const data = await response.blob();
+
+    if (!data.type.startsWith("video/")) {
+      throw new Error(
+        "Model tidak mengembalikan file video. " +
+        "Model mungkin memerlukan format input atau proses lain."
+      );
+    }
+
+    const url = URL.createObjectURL(data);
+    const video = document.getElementById("hasil");
+    const download = document.getElementById("download");
+
+    video.src = url;
+    video.hidden = false;
+    download.href = url;
+    download.hidden = false;
+
+    status.textContent = "🎉 Video berhasil dibuat!";
+  } catch (error) {
+    status.textContent =
+      "Belum berhasil membuat video: " + error.message;
+  } finally {
+    tombol.disabled = false;
+  }
 }
 </script>
 </body>
