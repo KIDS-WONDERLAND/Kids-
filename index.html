@@ -1,17 +1,94 @@
-<!DOCTYPE html><html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Kelinci & Buaya</title><style>body{margin:0;padding:12px;background:#dff5ff;font-family:Arial;text-align:center}.card{max-width:540px;margin:auto;background:#fff;border-radius:24px;padding:18px;box-shadow:0 8px 24px rgba(0,0,0,.12)}textarea{width:92%;height:80px;border-radius:12px;border:2px solid #7b2cbf;padding:10px}.btn{background:#ff3e8d;color:#fff;border:none;padding:14px;width:92%;border-radius:30px;font-weight:bold;font-size:16px;margin:6px}canvas,video{width:100%;border-radius:16px;background:#000;margin-top:10px}.scene{background:#f0f7ff;padding:8px;border-radius:10px;margin:5px 0;font-size:13px;text-align:left}</style></head><body><div class="card"><h1>🐰 Kelinci & Buaya 🐊<br><small>Persahabatan dalam Kejujuran</small></h1><textarea id="p">Seekor kelinci putih kecil di tepi sungai mengejar kupu-kupu kuning, terpeleset jatuh ke air, bertemu buaya besar yang ternyata baik hati menolongnya ke tepi, akhirnya mereka berteman di sunset</textarea><button class="btn" id="goBtn" onclick="go()">🎬 Buat Video Seperti Contoh</button><button class="btn" style="background:#00b894" onclick="speechSynthesis.speak(new SpeechSynthesisUtterance(document.getElementById('p').value))">🔊 Narasi</button><div id="st" style="font-weight:bold;color:#d63031;margin:10px"></div><progress id="pr" style="display:none;width:90%"></progress><div id="box" style="display:none"><canvas id="c" width="720" height="1280"></canvas><video id="v" controls style="display:none"></video><a id="dl" style="display:none;background:#0984e3;color:#fff;padding:12px;border-radius:20px;text-decoration:none;font-weight:bold;display:block;margin-top:8px">⬇️ Download Video</a><div id="pre"></div></div></div><script>
-let imgs=[];const cv=document.getElementById('c'),cx=cv.getContext('2d');
-function sleep(ms){return new Promise(r=>setTimeout(r,ms))}
-async function loadImg(url){try{let im=new Image();im.crossOrigin='anonymous';await new Promise((res,rej)=>{im.onload=res;im.onerror=rej;setTimeout(rej,15000);im.src=url});return im}catch{return null}}
-async function go(){const st=document.getElementById('st'),pr=document.getElementById('pr'),box=document.getElementById('box'),btn=document.getElementById('goBtn');btn.disabled=true;box.style.display='block';pr.style.display='block';document.getElementById('pre').innerHTML='';imgs=[];
-let scenes=[
-{txt:"Kelinci putih di tepi sungai",prompt:"ultra realistic cute small white bunny sitting on grassy river bank, sunny day, yellow butterfly flying nearby, Pixar 3D style, 8k, cinematic lighting, river flowing"},
-{txt:"Kelinci kejar kupu-kupu",prompt:"cute white bunny standing on hind legs reaching for yellow butterfly, river bank, excited, Pixar style, highly detailed, motion blur"},
-{txt:"Kelinci jatuh ke sungai",prompt:"cute white bunny falling into river water, splash, scared expression, Pixar animation, dramatic"},
-{txt:"Kelinci berenang ketakutan",prompt:"cute white bunny swimming in river, water bubbles, big eyes scared, close up, Pixar 3d, cinematic"},
-{txt:"Muncul buaya besar",prompt:"huge friendly crocodile head appearing next to small white bunny in river, sharp teeth, yellow eyes, dramatic but not scary, Pixar style"},
-{txt:"Buaya selamatkan kelinci",prompt:"giant crocodile gently carrying small white bunny in green vest out of water to river bank, sunset lighting, heroic, Pixar"},
-{txt:"Persahabatan sunset",prompt:"cute white bunny in green vest and giant friendly crocodile sitting together on grass watching sunset over river, friendship, warm golden light, Pixar 3d, happy ending"}
-];
-for(let i=0;i<scenes.length;i++){pr.value=(i/scenes.length)*100;st.innerText=`Scene ${i+1}/7: ${scenes[i].txt}... Tunggu 8 detik`;let url=`https://image.pollinations.ai/prompt/${encodeURIComponent(scenes[i].prompt)}?width=720&height=1280&seed=${Math.floor(Math.random()*99999)}&model=turbo&nologo=true&enhance=true`;let im=await loadImg(url);if(!im&&i>0){im=imgs[imgs.length-1]}if(im){imgs.push(im);let d=document.createElement('div');d.className='scene';d.innerText=`✅ ${scenes[i].txt}`;let img=document.createElement('img');img.src=im.src;img.style.width='100%';img.style.borderRadius='12px';d.appendChild(img);document.getElementById('pre').appendChild(d)}if(i<scenes.length-1)await sleep(8000)}
-st.innerText='Menggabungkan jadi film 21 detik...';let stream=cv.captureStream(30),rec=new MediaRecorder(stream,{mimeType:'video/webm'}),ch=[];rec.ondataavailable=e=>{if(e.data.size>0)ch.push(e.data)};rec.onstop=()=>{let b=new Blob(ch,{type:'video/webm'}),url=URL.createObjectURL(b),vv=document.getElementById('v');vv.src=url;vv.style.display='block';let dl=document.getElementById('dl');dl.href=url;dl.download='kelinci-buaya-persahabatan.webm';dl.style.display='block';st.innerText='✅ VIDEO JADI! Persahabatan dalam Kejujuran - Siap upload!';pr.value=100;btn.disabled=false};rec.start(100);let start=Date.now(),total=21000,per=total/scenes.length;function draw(){let elapsed=Date.now()-start;if(elapsed>total){rec.stop();return}let idx=Math.min(Math.floor(elapsed/per),scenes.length-1);let prog=(elapsed%per)/per;let im=imgs[idx];if(!im){requestAnimationFrame(draw);return}let z=1+prog*0.18,w=cv.width*z,h=cv.height*z,x=(cv.width-w)/2,y=(cv.height-h)/2-prog*20;cx.fillRect(0,0,cv.width,cv.height);cx.drawImage(im,x,y,w,h);cx.fillStyle='rgba(0,0,0,0.45)';cx.fillRect(0,cv.height-160,cv.width,160);cx.fillStyle='white';cx.font='bold 20px Arial';cx.textAlign='center';cx.fillText(scenes[idx].txt,cv.width/2,cv.height-90);if(idx==scenes.length-1){cx.fillStyle='white';cx.font='bold 28px Arial';cx.fillText('Persahabatan',cv.width/2,cv.height/2-20);cx.font='bold 22px Arial';cx.fillText('dalam Kejujuran',cv.width/2,cv.height/2+20)}requestAnimationFrame(draw)}draw()}
-</script></body></html>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Kelinci Buaya</title>
+<style>
+body{background:#dff5ff;font-family:Arial;text-align:center;padding:10px}
+.card{max-width:500px;margin:auto;background:#fff;border-radius:20px;padding:15px}
+textarea{width:90%;height:70px;border-radius:10px;padding:8px}
+.btn{background:#ff3e8d;color:#fff;border:none;padding:12px;width:90%;border-radius:20px;margin:5px;font-weight:bold}
+canvas,video{width:100%;border-radius:15px;background:#000;margin-top:10px}
+</style>
+</head>
+<body>
+<div class="card">
+<h2>🐰 Kelinci & Buaya 🐊</h2>
+<textarea id="t">Kelinci putih kejar kupu kuning jatuh sungai, buaya tolong jadi teman</textarea>
+<button class="btn" onclick="go()">🎬 Buat Video</button>
+<div id="s" style="color:red;font-weight:bold;margin:8px"></div>
+<progress id="p" style="display:none;width:90%"></progress>
+<div id="b" style="display:none">
+<canvas id="c" width="720" height="1280"></canvas>
+<video id="v" controls style="display:none"></video>
+<a id="d" style="display:none;background:#0984e3;color:#fff;padding:10px;border-radius:15px;display:block;margin-top:8px;text-decoration:none">⬇️ Download</a>
+<div id="r"></div>
+</div>
+</div>
+<script>
+let I=[];let cv=document.getElementById('c');let cx=cv.getContext('2d');
+function W(m){return new Promise(o=>setTimeout(o,m))}
+async function L(u){
+ try{
+  let im=new Image();im.crossOrigin='anonymous';
+  await new Promise((a,b)=>{im.onload=a;im.onerror=b;im.src=u});
+  return im;
+ }catch{return null}
+}
+async function go(){
+ let st=document.getElementById('s');
+ let pr=document.getElementById('p');
+ let box=document.getElementById('b');
+ box.style.display='block';pr.style.display='block';
+ document.getElementById('r').innerHTML='';I=[];
+ let S=[
+  ["Di tepi sungai","white bunny river bank yellow butterfly pixar"],
+  ["Kejar kupu","white bunny reaching yellow butterfly pixar"],
+  ["Jatuh sungai","white bunny falling river splash pixar"],
+  ["Berenang","white bunny swimming scared pixar"],
+  ["Buaya muncul","friendly crocodile river bunny pixar"],
+  ["Buaya tolong","crocodile saving bunny river bank pixar"],
+  ["Teman sunset","bunny crocodile friendship sunset pixar"]
+ ];
+ for(let i=0;i<S.length;i++){
+  pr.value=i*14;
+  st.innerText="Scene "+(i+1)+"/7: "+S[i][0]+"...";
+  let url="https://image.pollinations.ai/prompt/"+encodeURIComponent(S[i][1])+"?width=720&height=1280&seed="+Math.floor(Math.random()*9999)+"&model=turbo&nologo=true";
+  let im=await L(url);
+  if(!im&&I.length>0)im=I[I.length-1];
+  if(im){I.push(im);let x=document.createElement('img');x.src=im.src;x.style.width='100%';x.style.borderRadius='10px';document.getElementById('r').appendChild(x);}
+  if(i<S.length-1)await W(8000);
+ }
+ st.innerText="Jadi film...";
+ let stt=cv.captureStream(30);
+ let rec=new MediaRecorder(stt);let ch=[];
+ rec.ondataavailable=e=>{if(e.data.size>0)ch.push(e.data)};
+ rec.onstop=()=>{
+  let b=new Blob(ch,{type:'video/webm'});
+  let u=URL.createObjectURL(b);
+  let vv=document.getElementById('v');vv.src=u;vv.style.display='block';
+  let dl=document.getElementById('d');dl.href=u;dl.download='kelinci-buaya.webm';dl.style.display='block';
+  st.innerText="✅ VIDEO JADI!";
+ };
+ rec.start();
+ let stime=Date.now();let tot=21000;let per=tot/S.length;
+ function D(){
+  let e=Date.now()-stime;if(e>tot){rec.stop();return}
+  let idx=Math.floor(e/per);if(idx>=S.length)idx=S.length-1;
+  let im=I[idx];if(!im){requestAnimationFrame(D);return}
+  cx.fillRect(0,0,cv.width,cv.height);
+  cx.drawImage(im,0,0,cv.width,cv.height);
+  cx.fillStyle='rgba(0,0,0,0.5)';cx.fillRect(0,cv.height-120,cv.width,120);
+  cx.fillStyle='white';cx.font='bold 20px Arial';cx.textAlign='center';
+  cx.fillText(S[idx][0],cv.width/2,cv.height-50);
+  if(idx==6){
+   cx.font='bold 28px Arial';cx.fillText('Persahabatan',cv.width/2,cv.height/2-10);
+   cx.font='bold 20px Arial';cx.fillText('dalam Kejujuran',cv.width/2,cv.height/2+20);
+  }
+  requestAnimationFrame(D);
+ }D();
+}
+</script>
+</body>
+</html>
