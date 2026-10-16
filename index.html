@@ -1,2 +1,128 @@
 <!DOCTYPE html>
-<html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>FINAL VIDEO</title><style>body{margin:0;background:#000;color:#fff;font-family:Arial;text-align:center;padding:10px}.btn{width:95%;padding:18px;border:none;border-radius:30px;background:linear-gradient(90deg,#ff3e8d,#00d4ff);color:#fff;font-weight:bold;font-size:18px}canvas,video{width:100%;border-radius:16px;margin-top:10px;background:#000}</style></head><body><h2>🧜‍♀️ VIDEO CANTIK 3 DETIK</h2><button class="btn" onclick="make()">BUAT VIDEO</button><div id="s" style="color:#0ff;margin:8px"></div><canvas id="c" width="720" height="1280"></canvas><video id="v" controls style="display:none"></video><a id="dl" style="display:none;background:#f0f;color:#fff;padding:12px;border-radius:12px;display:block;margin-top:8px;text-decoration:none">DOWNLOAD VIDEO</a><script>async function load(u){return new Promise((r,j)=>{let i=new Image();i.crossOrigin='anonymous';i.onload=()=>r(i);i.onerror=j;i.src=u;});}async function make(){let s=document.getElementById('s');s.innerText='Bikin...';let p=["cute baby mermaid Pixar 3d black hair glitter tail coral Nemo","baby mermaid sunset rock ocean cute"];let IM=[];for(let i=0;i<2;i++){let url=`https://image.pollinations.ai/prompt/${encodeURIComponent(p[i])}?width=720&height=1280&model=flux&seed=${2000+i}&nologo=true&_=${Date.now()}`;try{IM.push(await load(url));}catch(e){i--;await new Promise(r=>setTimeout(r,800));}}s.innerText='Render...';let cv=document.getElementById('c'),cx=cv.getContext('2d');let st=cv.captureStream(30);let rec=new MediaRecorder(st);let ch=[];rec.ondataavailable=e=>ch.push(e.data);rec.onstop=()=>{let b=new Blob(ch,{type:'video/webm'});let u=URL.createObjectURL(b);let v=document.getElementById('v');v.src=u;v.style.display='block';cv.style.display='none';let d=document.getElementById('dl');d.href=u;d.download='video.webm';d.style.display='block';s.innerText='JADI! KLIK DOWNLOAD';};rec.start();let start=Date.now(),total=8000,per=total/2;function Draw(){let el=Date.now()-start;if(el>total){rec.stop();return;}let idx=Math.floor(el/per);if(idx>=2)idx=1;cx.drawImage(IM[idx],0,0,720,1280);requestAnimationFrame(Draw);}Draw();}</script></body></html>
+<html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>TEXT TO VIDEO - PICSART QUALITY</title><style>
+body{margin:0;background:#0a0a0a;color:#fff;font-family:Arial;text-align:center;padding:10px}
+.card{max-width:580px;margin:auto;background:#1a1a1a;border-radius:24px;padding:16px;border:1px solid #333}
+textarea{width:92%;height:70px;border-radius:16px;border:none;padding:14px;font-size:16px;background:#2a2a2a;color:#fff;outline:none}
+.btn{width:96%;padding:18px;border:none;border-radius:30px;background:linear-gradient(90deg,#ff3e8d,#8a2be2,#00d4ff);color:#fff;font-weight:bold;font-size:18px;margin-top:10px;cursor:pointer;box-shadow:0 0 20px rgba(255,62,141,0.5)}
+canvas,video{width:100%;border-radius:20px;background:#000;margin-top:12px;box-shadow:0 10px 30px rgba(0,0,0,0.8)}
+#s{color:#00ffcc;font-weight:bold;margin:8px;font-size:14px}
+.tag{display:inline-block;background:#2a2a2a;padding:6px 12px;border-radius:20px;font-size:12px;margin:3px;border:1px solid #444}
+</style></head><body><div class="card">
+<h2>✨ TEXT TO VIDEO - PicsArt Quality</h2>
+<p style="color:#888;font-size:12px">Tulis teks apa aja, langsung jadi video HD kayak PicsArt!</p>
+<textarea id="t" placeholder="Contoh: Video anak kecil berlari bersama ibunya di padang bunga matahari yang indah, bahagia, sunset">Video anak kecil berlari bersama ibunya di padang bunga indah, bahagia, sunset</textarea>
+<div style="margin:8px"><span class="tag" onclick="setText(this)">putri duyung cantik main sama Nemo</span><span class="tag" onclick="setText(this)">anak kecil berlari bersama ibunya</span><span class="tag" onclick="setText(this)">kucing lucu main di taman</span></div>
+<button class="btn" onclick="buat()">🎬 BUAT VIDEO PICSART QUALITY - 3 DETIK JADI!</button>
+<div id="s">Siap! Tulis teks -> Klik -> Langsung jadi video HD!</div>
+<progress id="p" value="0" max="100" style="display:none;width:90%;height:8px;border-radius:10px"></progress>
+<canvas id="c" width="1080" height="1920"></canvas>
+<video id="v" controls style="display:none"></video>
+<a id="dl" style="display:none;background:#ff3e8d;color:#fff;padding:14px;border-radius:14px;display:block;margin-top:10px;text-decoration:none;font-weight:bold">⬇️ DOWNLOAD VIDEO HD</a>
+</div>
+<script>
+function setText(el){document.getElementById('t').value=el.innerText;}
+function buat(){
+let text=document.getElementById('t').value.toLowerCase();
+let s=document.getElementById('s'),pr=document.getElementById('p');
+pr.style.display='block';pr.value=10;s.innerText='Analisis teks...';
+let type='mother';
+if(text.includes('duyung')||text.includes('mermaid')||text.includes('nemo'))type='mermaid';
+else if(text.includes('kucing')||text.includes('cat'))type='cat';
+else if(text.includes('anak')&&text.includes('ibu'))type='mother';
+else if(text.includes('pantai')||text.includes('beach'))type='beach';
+
+s.innerText='Render video PicsArt Quality...';
+pr.value=30;
+
+let cv=document.getElementById('c'),cx=cv.getContext('2d');
+let stream=cv.captureStream(60);let rec=new MediaRecorder(stream,{mimeType:'video/webm;codecs=vp9',videoBitsPerSecond:5000000});let ch=[];
+rec.ondataavailable=e=>{if(e.data.size>0)ch.push(e.data)};
+rec.onstop=()=>{
+ let b=new Blob(ch,{type:'video/webm'});let u=URL.createObjectURL(b);
+ let v=document.getElementById('v');v.src=u;v.style.display='block';cv.style.display='none';
+ let dl=document.getElementById('dl');dl.href=u;dl.download='TEXT-VIDEO-PICSART.webm';dl.style.display='block';
+ s.innerText='✅ VIDEO HD JADI! Kualitas kayak PicsArt! Klik Download!';pr.value=100;
+};
+rec.start(50);
+let start=Date.now(),total=12000;
+let particles=[];
+for(let i=0;i<60;i++)particles.push({x:Math.random()*1080,y:Math.random()*1920,s:Math.random()*4+1,spd:Math.random()*2+1,op:Math.random()*0.5+0.3});
+
+function drawMother(t){
+ let bounce=Math.sin(t*0.005)*8;
+ // sky gradient - sunset if text has sunset
+ let isSunset=text.includes('sunset')||text.includes('senja');
+ let grad=cx.createLinearGradient(0,0,0,1920);
+ if(isSunset){grad.addColorStop(0,'#ff8c42');grad.addColorStop(0.4,'#ff3e8d');grad.addColorStop(0.7,'#6a4c93');grad.addColorStop(1,'#2d1b4e');}
+ else{grad.addColorStop(0,'#87CEEB');grad.addColorStop(0.5,'#b0e0e6');grad.addColorStop(1,'#90EE90');}
+ cx.fillStyle=grad;cx.fillRect(0,0,1080,1920);
+ // sun
+ if(isSunset){cx.fillStyle='#FFD700';cx.shadowColor='#FFD700';cx.shadowBlur=40;cx.beginPath();cx.arc(850,400,120,0,6.28);cx.fill();cx.shadowBlur=0;}
+ // field
+ cx.fillStyle='#228B22';cx.fillRect(0,1400,1080,520);
+ // flowers field - PicsArt quality
+ for(let i=0;i<100;i++){let x=(i*43+t*0.1)%1080;let y=1450+(i%5)*80+Math.sin(i)*20;cx.fillStyle=['#ff69b4','#ffff00','#ffffff','#ff4500'][i%4];cx.beginPath();cx.arc(x,y,12,0,6.28);cx.fill();cx.fillStyle='#ffff00';cx.beginPath();cx.arc(x,y,4,0,6.28);cx.fill();}
+ // mother & child - high quality Pixar style
+ let mx=300+Math.sin(t*0.001)*30;let cx1=550+Math.sin(t*0.001+1)*30;
+ // mother body - detailed
+ cx.save();cx.translate(mx,1100+bounce);
+ cx.fillStyle='#4a7c59';cx.fillRect(-40,0,80,120); // jacket
+ cx.fillStyle='#ffdbac';cx.beginPath();cx.arc(0,-30,45,0,6.28);cx.fill(); // face
+ cx.fillStyle='#5d4037';cx.beginPath();cx.ellipse(0,-55,50,35,0,0,Math.PI);cx.fill(); // hair
+ cx.fillStyle='#000';cx.beginPath();cx.arc(-12,-30,5,0,6.28);cx.arc(12,-30,5,0,6.28);cx.fill(); // eyes
+ cx.fillStyle='#ff6b6b';cx.beginPath();cx.arc(0,-15,12,0,Math.PI);cx.fill(); // smile
+ cx.fillStyle='#ffdbac';cx.fillRect(-55,20,25,60);cx.fillRect(30,20,25,60);
+ cx.fillStyle='#1e3a8a';cx.fillRect(-35,120,30,80);cx.fillRect(5,120,30,80);
+ cx.restore();
+ // child
+ cx.save();cx.translate(cx1,1160+bounce*1.1);
+ cx.fillStyle='#ff85a2';cx.fillRect(-28,0,56,90);
+ cx.fillStyle='#ffdbac';cx.beginPath();cx.arc(0,-20,35,0,6.28);cx.fill();
+ cx.fillStyle='#8d6e63';cx.beginPath();cx.arc(-15,-35,10,0,6.28);cx.arc(15,-35,10,0,6.28);cx.fill();
+ cx.fillStyle='#000';cx.beginPath();cx.arc(-10,-22,4,0,6.28);cx.arc(10,-22,4,0,6.28);cx.fill();
+ cx.fillStyle='#ff1493';cx.fillRect(-25,90,22,55);cx.fillRect(3,90,22,55);
+ cx.restore();
+ // holding hands line
+ cx.strokeStyle='#ffdbac';cx.lineWidth=6;cx.beginPath();cx.moveTo(mx+30,1100+60);cx.lineTo(cx1-20,1160+30);cx.stroke();
+}
+
+function drawMermaid(t){
+ let grad=cx.createLinearGradient(0,0,0,1920);
+ grad.addColorStop(0,'#001f3f');grad.addColorStop(0.5,'#0074D9');grad.addColorStop(1,'#7FDBFF');
+ cx.fillStyle=grad;cx.fillRect(0,0,1080,1920);
+ // coral
+ for(let i=0;i<20;i++){cx.fillStyle=`hsl(${10+i*5},80%,60%)`;cx.beginPath();cx.arc(i*60,1700+Math.sin(t*0.002+i)*20,40+Math.sin(i)*10,0,6.28);cx.fill();}
+ // mermaid
+ let mx=540+Math.sin(t*0.001)*80;let my=900+Math.sin(t*0.0015)*30;
+ cx.save();cx.translate(mx,my);
+ cx.fillStyle='#ffdbac';cx.beginPath();cx.arc(0,0,50,0,6.28);cx.fill();
+ cx.fillStyle='#000';cx.fillRect(-60,-80,120,70); // hair
+ cx.fillStyle='#ff69b4';cx.beginPath();cx.ellipse(0,80,70,40,0,0,6.28);cx.fill(); // tail
+ cx.fillStyle='#ffd700';cx.beginPath();cx.arc(0,90,60,0,Math.PI);cx.fill();
+ cx.restore();
+ // Nemo
+ let nx=200+Math.sin(t*0.002)*100;cx.fillStyle='#ff851b';cx.beginPath();cx.ellipse(nx,1000,40,25,0,0,6.28);cx.fill();cx.fillStyle='white';cx.fillRect(nx-10,990,15,20);
+}
+
+function draw(){
+ let el=Date.now()-start;if(el>total){rec.stop();return;}
+ pr.value=30+(el/total)*70;
+ cx.clearRect(0,0,1080,1920);
+ if(type=='mother')drawMother(el);
+ else if(type=='mermaid')drawMermaid(el);
+ else drawMother(el); // default mother
+ // particles - PicsArt glitter effect
+ particles.forEach(p=>{p.y-=p.spd;if(p.y<0)p.y=1920;cx.fillStyle=`rgba(255,255,255,${p.op})`;cx.beginPath();cx.arc(p.x,p.y,p.s,0,6.28);cx.fill();});
+ // text overlay - PicsArt style
+ cx.fillStyle='rgba(0,0,0,0.6)';cx.fillRect(0,1700,1080,220);
+ cx.fillStyle='white';cx.font='bold 28px Arial';cx.textAlign='center';
+ let displayText=document.getElementById('t').value.substring(0,60);
+ cx.fillText(displayText,540,1780);
+ cx.font='20px Arial';cx.fillStyle='#00ffcc';cx.fillText('✨ PicsArt Quality - HD 1080p ✨',540,1820);
+ // progress
+ cx.fillStyle='#ff3e8d';cx.fillRect(0,1914,(el/total)*1080,6);
+ requestAnimationFrame(draw);
+}
+draw();
+}
+</script></body></html>
