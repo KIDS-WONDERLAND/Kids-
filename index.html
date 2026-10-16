@@ -3,113 +3,103 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>FINAL 3D PIXAR</title>
+<title>PICSART FINAL</title>
 <style>
 body{font-family:Arial;background:#0f172a;color:#fff;text-align:center;padding:10px;margin:0}
 .card{background:#1e293b;max-width:560px;margin:auto;border-radius:20px;padding:16px}
 textarea{width:92%;height:75px;border-radius:12px;padding:10px}
 .btn{background:linear-gradient(90deg,#ff3e8d,#06ffa5);color:#000;border:none;padding:15px;width:92%;border-radius:25px;font-weight:bold;margin:6px;font-size:17px}
 canvas,video{width:100%;border-radius:16px;background:#000;margin-top:10px}
+.filters{display:flex;gap:6px;overflow-x:auto;padding:8px 0}
+.f{padding:8px 14px;border-radius:20px;background:#334155;color:#fff;border:none;font-size:12px;cursor:pointer}
+.f.active{background:#ff3e8d}
 </style>
 </head>
 <body>
 <div class="card">
-<h2>🎬 FINAL 3D PIXAR</h2>
-<p style="color:#06ffa5;font-size:11px">3D Halus + Anti Limit</p>
-<textarea id="story">Kelinci putih lari kejar kupu kuning di tepi sungai, terpeleset jatuh, berenang takut, buaya tolong, mereka berteman sunset, persahabatan dalam kejujuran</textarea>
-<button class="btn" onclick="make()">🎬 BUAT VIDEO 3D PIXAR 30 DETIK</button>
+<h2>✨ PICSART FINAL 3D</h2>
+<p style="color:#06ffa5;font-size:11px">Filter Aesthetic + Sparkle + Stiker</p>
+<textarea id="story">Kelinci putih lucu lari kejar kupu kuning cantik di tepi sungai, terpeleset jatuh ke sungai berenang ketakutan, buaya hijau baik hati menolongnya, mereka berteman melihat sunset indah, persahabatan dalam kejujuran</textarea>
+<div class="filters">
+<button class="f active" onclick="setF('picsart',this)">🌸 Picsart</button>
+<button class="f" onclick="setF('warm',this)">🔥 Warm</button>
+<button class="f" onclick="setF('pink',this)">💖 Pink</button>
+<button class="f" onclick="setF('vintage',this)">📸 Vintage</button>
+<button class="f" onclick="setF('dreamy',this)">✨ Dreamy</button>
+</div>
+<button class="btn" onclick="make()">🎨 BUAT VIDEO PICSART 30 DETIK</button>
 <div id="s" style="color:#06ffa5;font-weight:bold;margin:8px"></div>
+<div id="count" style="color:#fbbf24;font-size:13px"></div>
+<progress id="p" style="display:none;width:90%"></progress>
 <div id="box" style="display:none">
 <canvas id="c" width="720" height="1280"></canvas>
 <video id="v" controls style="display:none"></video>
-<a id="dl" style="display:none;background:#3b82f6;color:#fff;padding:12px;border-radius:15px;display:block;margin-top:8px;text-decoration:none;font-weight:bold">⬇️ Download Video 3D</a>
+<a id="dl" style="display:none;background:#3b82f6;color:#fff;padding:12px;border-radius:15px;display:block;margin-top:8px;text-decoration:none;font-weight:bold">⬇️ Download Video Picsart</a>
 </div>
 </div>
 <script>
-let cv=document.getElementById('c'),cx=cv.getContext('2d');
+let cv=document.getElementById('c'),cx=cv.getContext('2d'),IM=[],FILTER='picsart';
+function setF(f,el){FILTER=f;document.querySelectorAll('.f').forEach(b=>b.classList.remove('active'));el.classList.add('active');}
+function W(m){return new Promise(r=>setTimeout(r,m))}
+async function loadImg(url){
+ return new Promise((res,rej)=>{
+  let im=new Image();im.crossOrigin='anonymous';
+  im.onload=()=>{let c=document.createElement('canvas');c.width=10;c.height=10;let cc=c.getContext('2d');cc.drawImage(im,0,0,10,10);let d=cc.getImageData(0,0,10,10).data;let yellow=d[0]>200&&d[1]>180&&d[2]<100;if(yellow){rej('yellow');}else res(im);};
+  im.onerror=()=>rej('err');im.src=url;
+ });
+}
+function split(t){let a=t.split(/[,.\n]+/).filter(x=>x.trim().length>10);if(a.length<3){let m=Math.floor(t.length/3);a=[t.slice(0,m),t.slice(m,m*2),t.slice(m*2)];}if(a.length>4)a=a.slice(0,4);return a.map(x=>x.trim());}
 function ease(t){return t<0.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2}
 function lerp(a,b,t){return a+(b-a)*t}
-function shadow(x,y,w,h){cx.save();cx.fillStyle='rgba(0,0,0,0.25)';cx.beginPath();cx.ellipse(x,y,w,h,0,0,6.28);cx.fill();cx.restore();}
-function bunny3D(x,y,s,r,leg){
- cx.save();cx.translate(x,y);cx.rotate(r);cx.scale(s,s);
- shadow(0,60,50,12);
- let g=cx.createRadialGradient(-10,-10,10,0,20,55);g.addColorStop(0,'#ffffff');g.addColorStop(1,'#e0e0e0');
- cx.fillStyle=g;cx.beginPath();cx.ellipse(0,20,50,55,0,0,6.28);cx.fill();
- cx.fillStyle='rgba(255,255,255,0.8)';cx.beginPath();cx.ellipse(-15,-5,12,18,-0.3,0,6.28);cx.fill();
- let eg=cx.createLinearGradient(0,-70,0,0);eg.addColorStop(0,'#fff');eg.addColorStop(1,'#ddd');
- cx.fillStyle=eg;cx.beginPath();cx.ellipse(-20,-40,14,40,-0.2,0,6.28);cx.fill();
- cx.beginPath();cx.ellipse(20,-40,14,40,0.2,0,6.28);cx.fill();
- cx.fillStyle='#ffb6d9';cx.beginPath();cx.ellipse(-20,-40,6,20,-0.2,0,6.28);cx.fill();
- cx.beginPath();cx.ellipse(20,-40,6,20,0.2,0,6.28);cx.fill();
- let hg=cx.createRadialGradient(-5,-15,5,0,-5,38);hg.addColorStop(0,'#fff');hg.addColorStop(1,'#f0f0f0');
- cx.fillStyle=hg;cx.beginPath();cx.ellipse(0,-5,42,36,0,0,6.28);cx.fill();
- cx.fillStyle='#111';cx.beginPath();cx.arc(-12,-8,6,0,6.28);cx.arc(12,-8,6,0,6.28);cx.fill();
- cx.fillStyle='#fff';cx.beginPath();cx.arc(-10,-10,2.5,0,6.28);cx.arc(14,-10,2.5,0,6.28);cx.fill();
- cx.fillStyle='#ff4d8a';cx.beginPath();cx.arc(0,0,4,0,6.28);cx.fill();
- cx.fillStyle='rgba(255,255,255,0.9)';cx.beginPath();cx.ellipse(-16,38,14,20,leg,0,6.28);cx.ellipse(16,38,14,20,-leg,0,6.28);cx.fill();
- cx.restore();
-}
-function butterfly3D(x,y,t){
- cx.save();cx.translate(x,y);cx.rotate(Math.sin(t*0.012)*0.4);
- shadow(0,15,35,10);
- let wing=Math.sin(t*0.03)*0.4;
- cx.save();cx.rotate(wing);
- let g1=cx.createRadialGradient(-15,0,5,-15,0,30);g1.addColorStop(0,'#ffeb3b');g1.addColorStop(1,'#ff9800');
- cx.fillStyle=g1;cx.beginPath();cx.ellipse(-20,0,20,32,-0.3,0,6.28);cx.fill();
- cx.fillStyle='rgba(255,255,255,0.6)';cx.beginPath();cx.ellipse(-22,-8,8,12,-0.3,0,6.28);cx.fill();
- cx.restore();
- cx.save();cx.rotate(-wing);
- let g2=cx.createRadialGradient(15,0,5,15,0,30);g2.addColorStop(0,'#ffeb3b');g2.addColorStop(1,'#ff9800');
- cx.fillStyle=g2;cx.beginPath();cx.ellipse(20,0,20,32,0.3,0,6.28);cx.fill();
- cx.fillStyle='rgba(255,255,255,0.6)';cx.beginPath();cx.ellipse(22,-8,8,12,0.3,0,6.28);cx.fill();
- cx.restore();
- cx.fillStyle='#3e2723';cx.fillRect(-3,-15,6,30);
- cx.fillStyle='#000';cx.beginPath();cx.arc(-5,-18,2,0,6.28);cx.arc(5,-18,2,0,6.28);cx.fill();
- cx.restore();
-}
-function croc3D(x,y,s){
- cx.save();cx.translate(x,y);cx.scale(s,s);
- shadow(0,30,90,18);
- let g=cx.createLinearGradient(0,-30,0,30);g.addColorStop(0,'#4caf50');g.addColorStop(0.5,'#2e7d32');g.addColorStop(1,'#1b5e20');
- cx.fillStyle=g;cx.beginPath();cx.ellipse(0,0,95,40,0,0,6.28);cx.fill();
- let hg=cx.createRadialGradient(50,-10,5,70,0,40);hg.addColorStop(0,'#66bb6a');hg.addColorStop(1,'#2e7d32');
- cx.fillStyle=hg;cx.beginPath();cx.ellipse(70,0,50,32,0,0,6.28);cx.fill();
- cx.fillStyle='#a5d6a7';cx.beginPath();cx.ellipse(-10,-12,28,10,0,0,6.28);cx.fill();
- cx.fillStyle='#fff';cx.beginPath();cx.arc(85,-10,7,0,6.28);cx.arc(98,-10,7,0,6.28);cx.fill();
- cx.fillStyle='#111';cx.beginPath();cx.arc(86,-10,3.5,0,6.28);cx.arc(99,-10,3.5,0,6.28);cx.fill();
- cx.fillStyle='#fff';cx.beginPath();cx.arc(84,-12,2,0,6.28);cx.arc(97,-12,2,0,6.28);cx.fill();
- cx.fillStyle='#81c784';cx.beginPath();cx.ellipse(95,12,8,5,0,0,6.28);cx.fill();
- cx.fillStyle='#fff';cx.beginPath();cx.moveTo(80,8);cx.lineTo(85,14);cx.lineTo(90,8);cx.lineTo(95,14);cx.lineTo(100,8);cx.fill();
- cx.restore();
-}
-function speak(t){let v=speechSynthesis.getVoices().find(x=>x.lang.includes('id'))||speechSynthesis.getVoices()[0];let u=new SpeechSynthesisUtterance(t);u.voice=v;u.lang='id-ID';u.rate=0.9;u.pitch=1.1;speechSynthesis.speak(u);}
-function make(){
- let st=document.getElementById('s'),box=document.getElementById('box');
- box.style.display='block';st.innerText='Render 3D Pixar 30 detik...';
+async function make(){
+ let st=document.getElementById('s'),cnt=document.getElementById('count'),pr=document.getElementById('p'),box=document.getElementById('box');
+ box.style.display='block';pr.style.display='block';IM=[];
+ let scenes=split(document.getElementById('story').value);
+ for(let i=0;i<scenes.length;i++){
+  pr.value=(i/scenes.length)*50;st.innerText='Gambar Picsart '+(i+1)+'/'+scenes.length+'...';
+  let ok=false,attempt=0;
+  while(!ok&&attempt<5){
+   let prompt='pixar 3d cute, aesthetic picsart style, '+scenes[i]+', soft bokeh, dreamy lighting, highly detailed, 8k, cute, vibrant';
+   let url='https://image.pollinations.ai/prompt/'+encodeURIComponent(prompt)+'?width=720&height=1280&model=flux&seed='+Math.floor(Math.random()*999999)+'&nologo=true&_='+Date.now();
+   try{let im=await loadImg(url);IM.push({img:im,text:scenes[i]});ok=true;cnt.innerText='';}
+   catch(e){attempt++;cnt.innerText='Tunggu anti kuning '+attempt+'/5';
+    for(let sec=45;sec>0;sec--){cnt.innerText='Anti kuning: '+sec+'s...';await W(1000);}}
+  }
+  if(i<scenes.length-1&&ok){for(let sec=45;sec>0;sec--){cnt.innerText='Tunggu biar cantik: '+sec+'s ('+(i+1)+'/'+scenes.length+')';await W(1000);}}
+ }
+ st.innerText='Render Picsart Aesthetic 60fps...';pr.value=80;
  let stream=cv.captureStream(60);let rec=new MediaRecorder(stream,{mimeType:'video/webm'});let ch=[];
  rec.ondataavailable=e=>{if(e.data.size>0)ch.push(e.data)};
- rec.onstop=()=>{let b=new Blob(ch,{type:'video/webm'});let u=URL.createObjectURL(b);let vv=document.getElementById('v');vv.src=u;vv.style.display='block';let dl=document.getElementById('dl');dl.href=u;dl.download='FINAL-3D-PIXAR.webm';dl.style.display='block';st.innerText='✅ FINAL 3D PIXAR JADI!';};
- rec.start(50);speak(document.getElementById('story').value);
- let start=Date.now(),total=30000;
+ rec.onstop=()=>{let b=new Blob(ch,{type:'video/webm'});let u=URL.createObjectURL(b);let vv=document.getElementById('v');vv.src=u;vv.style.display='block';let dl=document.getElementById('dl');dl.href=u;dl.download='PICSART-3D.webm';dl.style.display='block';st.innerText='✅ VIDEO PICSART JADI!';pr.value=100;cnt.innerText='';};
+ rec.start(50);
+ let start=Date.now(),total=30000,per=total/IM.length,sparkles=[];
+ for(let i=0;i<25;i++)sparkles.push({x:Math.random()*720,y:Math.random()*1280,s:Math.random()*3+1,spd:Math.random()*2+0.5});
  function Draw(){
-  let el=Date.now()-start;if(el>total){rec.stop();speechSynthesis.cancel();return;}
-  let p=el/total;let e=ease((el%7500)/7500);let scene=Math.floor(el/7500);
-  let grad=cx.createLinearGradient(0,0,0,cv.height);
-  if(scene<3){grad.addColorStop(0,'#87CEEB');grad.addColorStop(1,'#c8e6c9');}else{grad.addColorStop(0,'#ff8a65');grad.addColorStop(1,'#ffe0b2');}
-  cx.fillStyle=grad;cx.fillRect(0,0,cv.width,cv.height);
-  cx.fillStyle='#4fc3f7';cx.fillRect(0,cv.height*0.65,cv.width,cv.height*0.35);
-  let sg=cx.createLinearGradient(0,cv.height*0.58,0,cv.height*0.65);sg.addColorStop(0,'#a5d6a7');sg.addColorStop(1,'#66bb6a');
-  cx.fillStyle=sg;cx.fillRect(0,cv.height*0.58,cv.width,120);
-  let bx=0,by=0,br=0,leg=0,fx=0,fy=0;
-  if(scene==0){bx=lerp(100,400,e);by=cv.height*0.6+Math.abs(Math.sin(e*12))* -35;leg=Math.sin(e*20)*0.6;fx=450+Math.sin(el*0.005)*35;fy=290+Math.cos(el*0.004)*22;}
-  else if(scene==1){let f=e*e;bx=lerp(350,280,f);by=lerp(cv.height*0.6,cv.height*0.8,f);br=f*0.8;fx=300;fy=270;cx.fillStyle='rgba(255,255,255,0.5)';for(let i=0;i<20;i++){cx.beginPath();cx.arc(Math.random()*cv.width,cv.height*0.65+Math.random()*200,5,0,6.28);cx.fill();}}
-  else if(scene==2){bx=320+Math.sin(el*0.008)*32;by=cv.height*0.78+Math.sin(el*0.01)*12;fx=200;fy=250;croc3D(lerp(-120,180,e),cv.height*0.82,1.25);}
-  else{bx=250;by=cv.height*0.65;fx=360;fy=275;croc3D(180,cv.height*0.82,1.25);cx.fillStyle='rgba(0,0,0,0.25)';cx.fillRect(0,0,cv.width,cv.height);cx.fillStyle='white';cx.font='bold 38px Arial';cx.textAlign='center';cx.fillText('Persahabatan',cv.width/2,cv.height/2-22);cx.font='bold 28px Arial';cx.fillText('dalam Kejujuran',cv.width/2,cv.height/2+22);}
-  butterfly3D(fx,fy,el);bunny3D(bx,by,1.5,br,leg);
-  if(scene==0){cx.fillStyle='white';cx.font='bold 21px Arial';cx.textAlign='center';cx.fillText('Kelinci lari kejar kupu kuning',cv.width/2,cv.height-85);}
-  if(scene==1){cx.fillStyle='white';cx.font='bold 21px Arial';cx.textAlign='center';cx.fillText('Terpeleset jatuh ke sungai!',cv.width/2,cv.height-85);}
-  if(scene==2){cx.fillStyle='white';cx.font='bold 21px Arial';cx.textAlign='center';cx.fillText('Buaya baik menolongnya',cv.width/2,cv.height-85);}
-  cx.fillStyle='#06ffa5';cx.fillRect(0,cv.height-5,p*cv.width,5);
+  let el=Date.now()-start;if(el>total){rec.stop();return;}
+  let idx=Math.floor(el/per);if(idx>=IM.length)idx=IM.length-1;
+  let prog=(el%per)/per;let e=ease(prog);let d=IM[idx];
+  let scale=lerp(1,1.25,e);let x=lerp(-50,50,e);let y=lerp(-25,25,e);
+  cx.save();
+  if(FILTER=='warm')cx.filter='sepia(0.2) saturate(1.3) brightness(1.1)';
+  else if(FILTER=='pink')cx.filter='hue-rotate(320deg) saturate(1.4) brightness(1.1)';
+  else if(FILTER=='vintage')cx.filter='sepia(0.4) contrast(1.1) brightness(1.05)';
+  else if(FILTER=='dreamy')cx.filter='blur(0.3px) brightness(1.15) saturate(1.3)';
+  else cx.filter='saturate(1.25) contrast(1.1) brightness(1.05)';
+  cx.fillRect(0,0,cv.width,cv.height);
+  cx.translate(cv.width/2+x,cv.height/2+y);cx.scale(scale,scale);
+  cx.drawImage(d.img,-cv.width/2,-cv.height/2,cv.width,cv.height);
+  cx.restore();
+  // picsart sparkle bokeh
+  sparkles.forEach(s=>{s.y-=s.spd;if(s.y<0)s.y=1280;cx.fillStyle='rgba(255,255,255,'+(0.3+Math.sin(el*0.005+s.x)*0.3)+')';cx.beginPath();cx.arc(s.x,s.y,s.s,0,6.28);cx.fill();if(Math.random()>0.98){cx.fillStyle='rgba(255,200,255,0.8)';cx.beginPath();cx.arc(s.x,s.y,6,0,6.28);cx.fill();}});
+  // picsart vignette + gradient
+  let grad=cx.createRadialGradient(cv.width/2,cv.height/2,0,cv.width/2,cv.height/2,cv.width);
+  grad.addColorStop(0,'rgba(0,0,0,0)');grad.addColorStop(1,'rgba(0,0,0,0.35)');cx.fillStyle=grad;cx.fillRect(0,0,cv.width,cv.height);
+  // picsart text aesthetic
+  cx.fillStyle='rgba(0,0,0,0.5)';cx.fillRect(0,cv.height-150,cv.width,150);
+  cx.fillStyle='white';cx.font='bold 22px Arial';cx.textAlign='center';cx.shadowColor='rgba(255,62,141,0.8)';cx.shadowBlur=10;cx.fillText(d.text.substring(0,38),cv.width/2,cv.height-75);cx.shadowBlur=0;
+  // picsart sticker
+  cx.font='28px Arial';cx.fillText('✨🦋💖',cv.width-90,80+Math.sin(el*0.004)*10);
+  cx.fillStyle='#06ffa5';cx.fillRect(0,cv.height-5,(el/total)*cv.width,5);
   requestAnimationFrame(Draw);
  }Draw();
 }
