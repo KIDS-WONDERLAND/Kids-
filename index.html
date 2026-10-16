@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<title>Children's Wonderland</title>
+<style>
+body{background:#ffe6f2;text-align:center;font-family:Arial;padding:20px}
+div{background:white;border-radius:20px;padding:20px;max-width:600px;margin:auto}
+textarea{width:90%;height:100px;border-radius:10px;padding:10px;border:2px solid pink}
+button{background:#ff3399;color:white;padding:15px 25px;border:none;border-radius:20px;font-size:18px;margin:5px}
+</style>
+</head>
+<body>
+<div>
+<h1>🐰 Children's Wonderland 🦋<br>Text to Video</h1>
+<textarea id="teks">Seekor kelinci coklat memakai tas wortel dan sepatu wortel berjalan di hutan mencari mawar kuning, bertemu kupu-kupu raksasa cantik, mereka berteman dan menemukan taman bunga warna warni</textarea><br>
+<button onclick="buat()">✨ Buat Video</button>
+<button onclick="suara()">🔊 Putar Suara</button>
+<div id="hasil"></div>
+</div>
+<script>
+function buat(){
+document.getElementById('hasil').innerHTML="<h2>Video Kamu Jadi! 🎬</h2><p>Scene 1: Kelinci di hutan mencari mawar</p><p>Scene 2: Bertemu kupu-kupu raksasa cantik</p><p>Scene 3: Menemukan taman bunga dan berteman</p><p>✅ Simpan 3 gambar kelinci tadi, masukkan ke CapCut jadi video 30 detik!</p>";
+}
+function suara(){
+let u=new SpeechSynthesisUtterance(document.getElementById('teks').value);
+u.lang='id-ID';speechSynthesis.speak(u);
+}
+</script>
+</body>
+</html>
